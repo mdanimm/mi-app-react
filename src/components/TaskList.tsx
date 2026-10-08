@@ -1,44 +1,81 @@
-import { useEffect, useState } from 'react';
-import { Task, getAllTasks, createTask, updateTask, deleteTask } from '../api/tasks.api';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  createTask,
+  deleteTask,
+  getAllTasks,
+  updateTask,
+  type PaginatedTasks,
+} from '../api/tasks.api';
+
+const PAGE_SIZE = 10;
 
 export function TaskList() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [page, setPage] = useState(1);
+  const [taskPage, setTaskPage] = useState<PaginatedTasks | null>(null);
   const [newTitle, setNewTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const loadTasks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAllTasks(page, PAGE_SIZE);
+      setTaskPage(result);
+      setError('');
+    } catch {
+      setError('No se pudo conectar con el backend.');
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
+
   useEffect(() => {
-    getAllTasks()
-      .then(setTasks)
-      .catch(() => setError('No se pudo conectar con el backend.'))
-      .finally(() => setLoading(false));
-  }, []);
+    void loadTasks();
+  }, [loadTasks]);
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
-    const task = await createTask({ title: newTitle });
-    setTasks((prev) => [...prev, task]);
+    await createTask({ title: newTitle });
     setNewTitle('');
+    await loadTasks();
   };
 
   const handleStatus = async (id: number, status: string) => {
-    const updated = await updateTask(id, { status });
-    setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    await updateTask(id, { status });
+    await loadTasks();
   };
 
   const handleDelete = async (id: number) => {
     await deleteTask(id);
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+
+    const remainingTotal = Math.max(0, (taskPage?.total ?? 1) - 1);
+    const remainingPages = Math.ceil(remainingTotal / PAGE_SIZE);
+
+    if (page > remainingPages && remainingPages > 0) {
+      setPage(remainingPages);
+      return;
+    }
+
+    await loadTasks();
   };
 
   if (loading) return <p>Cargando tareas...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
+  const tasks = taskPage?.data ?? [];
+  const currentPage = taskPage?.page ?? page;
+  const totalPages = taskPage?.totalPages ?? 0;
+
   return (
     <div>
       <h2>Tareas</h2>
-      <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Nueva tarea..." />
+      <input
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+        placeholder="Nueva tarea..."
+      />
       <button onClick={handleCreate}>Agregar</button>
+
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
@@ -49,6 +86,22 @@ export function TaskList() {
           </li>
         ))}
       </ul>
+
+      <button
+        onClick={() => setPage(currentPage - 1)}
+        disabled={loading || currentPage <= 1}
+      >
+        Anterior
+      </button>
+      <span>
+        {' '}Página {currentPage} de {totalPages}{' '}
+      </span>
+      <button
+        onClick={() => setPage(currentPage + 1)}
+        disabled={loading || currentPage >= totalPages}
+      >
+        Siguiente
+      </button>
     </div>
   );
 }

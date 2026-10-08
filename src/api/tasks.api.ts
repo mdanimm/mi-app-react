@@ -9,8 +9,17 @@ export interface Task {
   updatedAt: string;
 }
 
-export const getAllTasks = async (): Promise<Task[]> => {
-  const res = await fetch(API_URL);
+export interface PaginatedTasks {
+  data: Task[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export const getAllTasks = async (page: number, limit: number): Promise<PaginatedTasks> => {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  const res = await fetch(`${API_URL}?${params.toString()}`);
   if (!res.ok) throw new Error('Error al obtener las tareas');
   return res.json();
 };
