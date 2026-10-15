@@ -5,6 +5,7 @@ export interface Task {
   title: string;
   description?: string;
   status: string;
+  priority: 'low' | 'medium' | 'high';
   createdAt: string;
   updatedAt: string;
 }
@@ -17,34 +18,66 @@ export interface PaginatedTasks {
   totalPages: number;
 }
 
-export const getAllTasks = async (page: number, limit: number): Promise<PaginatedTasks> => {
-  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+export const getAllTasks = async (
+  page: number,
+  limit: number,
+): Promise<PaginatedTasks> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+
   const res = await fetch(`${API_URL}?${params.toString()}`);
-  if (!res.ok) throw new Error('Error al obtener las tareas');
+
+  if (!res.ok) {
+    throw new Error('Error al obtener las tareas');
+  }
+
   return res.json();
 };
 
-export const createTask = async (data: { title: string; description?: string }): Promise<Task> => {
+export const createTask = async (data: {
+  title: string;
+  description?: string;
+  status: string;
+  priority: 'low' | 'medium' | 'high';
+}): Promise<Task> => {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Error al crear la tarea');
+
+  if (!res.ok) {
+    throw new Error('Error al crear la tarea');
+  }
+
   return res.json();
 };
 
-export const updateTask = async (id: number, data: Partial<Task>): Promise<Task> => {
+export const updateTask = async (
+  id: number,
+  data: Partial<Task>,
+): Promise<Task> => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Error al actualizar la tarea');
+
+  if (!res.ok) {
+    throw new Error('Error al actualizar la tarea');
+  }
+
   return res.json();
 };
 
 export const deleteTask = async (id: number): Promise<void> => {
-  const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('Error al eliminar la tarea');
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    throw new Error('Error al eliminar la tarea');
+  }
 };

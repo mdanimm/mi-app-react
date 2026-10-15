@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  createTask,
-  deleteTask,
-  getAllTasks,
-  updateTask,
-  type PaginatedTasks,
-} from '../api/tasks.api';
+import { createTask, deleteTask, getAllTasks, updateTask, type PaginatedTasks } from '../api/tasks.api';
 
 const PAGE_SIZE = 10;
 
@@ -35,9 +29,19 @@ export function TaskList() {
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
-    await createTask({ title: newTitle });
-    setNewTitle('');
-    await loadTasks();
+
+    try {
+      await createTask({
+        title: newTitle.trim(),
+        status: 'pending',
+        priority: 'medium',
+      });
+
+      setNewTitle('');
+      await loadTasks();
+    } catch {
+      setError('No se pudo crear la tarea. Inténtalo nuevamente.');
+    }
   };
 
   const handleStatus = async (id: number, status: string) => {
@@ -69,20 +73,33 @@ export function TaskList() {
   return (
     <div>
       <h2>Tareas</h2>
+
       <input
         value={newTitle}
         onChange={(e) => setNewTitle(e.target.value)}
         placeholder="Nueva tarea..."
       />
+
       <button onClick={handleCreate}>Agregar</button>
 
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
             <strong>{task.title}</strong> — {task.status}
-            <button onClick={() => handleStatus(task.id, 'in_progress')}>▶</button>
-            <button onClick={() => handleStatus(task.id, 'done')}>✓</button>
-            <button onClick={() => handleDelete(task.id)}>✕</button>
+
+            <button
+              onClick={() => handleStatus(task.id, 'in_progress')}
+            >
+              ▶
+            </button>
+
+            <button onClick={() => handleStatus(task.id, 'done')}>
+              ✓
+            </button>
+
+            <button onClick={() => handleDelete(task.id)}>
+              ✕
+            </button>
           </li>
         ))}
       </ul>
@@ -93,9 +110,11 @@ export function TaskList() {
       >
         Anterior
       </button>
+
       <span>
         {' '}Página {currentPage} de {totalPages}{' '}
       </span>
+
       <button
         onClick={() => setPage(currentPage + 1)}
         disabled={loading || currentPage >= totalPages}
