@@ -1,16 +1,48 @@
-# React + Vite
+# Mi aplicación React
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Descripción
 
-Currently, two official plugins are available:
+Este proyecto forma parte de mi práctica de desarrollo frontend con React. En él trabajo con componentes reutilizables y conceptos fundamentales de React para construir interfaces web.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tecnologías utilizadas
 
-## React Compiler
+- React
+- JavaScript
+- Vite
+- Git y GitHub
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requisitos previos
 
-## Expanding the Oxlint configuration
+- Node.js y npm instalados.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Instalación y ejecución
+
+1. Clona el repositorio:
+
+   ```bash
+   git clone URL_DE_TU_REPOSITORIO
+   ```
+
+2. Entra en la carpeta del proyecto:
+
+   ```bash
+   cd mi-app-react
+   ```
+
+3. Instala las dependencias:
+
+   ```bash
+   npm install
+   ```
+
+4. Inicia el servidor de desarrollo:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Abre en el navegador la dirección local que aparece en la terminal, normalmente `http://localhost:5173`.
+
+## Estado del proyecto
+
+Proyecto de práctica desarrollado durante mi formación en desarrollo web.
